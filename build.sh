@@ -5,7 +5,7 @@ export JOBS="-j$((CPUS))"
 
 if [ ! -f .config ]
 then
-	make x86_64_defconfig
+	make x86_64_ubuntu_defconfig
 fi
 make $JOBS
 make modules
