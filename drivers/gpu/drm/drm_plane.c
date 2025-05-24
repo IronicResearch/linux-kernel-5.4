@@ -1099,6 +1099,9 @@ int drm_mode_page_flip_ioctl(struct drm_device *dev,
 			}
 			target_vblank += current_vblank;
 			break;
+		case DRM_MODE_PAGE_FLIP_TARGET_STEREO:
+			DRM_DEBUG("page flip target stereo offset %u\n", target_vblank);
+			break;
 		default:
 			target_vblank = current_vblank +
 				!(page_flip->flags & DRM_MODE_PAGE_FLIP_ASYNC);

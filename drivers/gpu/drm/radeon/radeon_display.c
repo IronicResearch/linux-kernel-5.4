@@ -471,6 +471,9 @@ static void radeon_flip_work_func(struct work_struct *__work)
 
 	/* do the flip (mmio) */
 	radeon_page_flip(rdev, radeon_crtc->crtc_id, work->base, work->async);
+	if (work->target_offset)
+		radeon_page_flip(rdev, radeon_crtc->crtc_id, 
+			work->base + work->target_offset, work->async);
 
 	radeon_crtc->flip_status = RADEON_FLIP_SUBMITTED;
 	spin_unlock_irqrestore(&crtc->dev->event_lock, flags);
@@ -575,8 +578,15 @@ static int radeon_crtc_page_flip_target(struct drm_crtc *crtc,
 		base &= ~7;
 	}
 	work->base = base;
-	work->target_vblank = target - (uint32_t)drm_crtc_vblank_count(crtc) +
-		dev->driver->get_vblank_counter(dev, work->crtc_id);
+	if (page_flip_flags & DRM_MODE_PAGE_FLIP_TARGET_STEREO) {
+		work->target_offset = target;
+		work->target_vblank = dev->driver->get_vblank_counter(dev, work->crtc_id);
+	}
+	else {
+		work->target_offset = 0;
+		work->target_vblank = target - (uint32_t)drm_crtc_vblank_count(crtc) +
+			dev->driver->get_vblank_counter(dev, work->crtc_id);
+	}
 
 	/* We borrow the event spin lock for protecting flip_work */
 	spin_lock_irqsave(&crtc->dev->event_lock, flags);
