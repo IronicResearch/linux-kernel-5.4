@@ -417,6 +417,7 @@ static void radeon_flip_work_func(struct work_struct *__work)
 	unsigned long flags;
 	int r;
 	int vpos, hpos;
+	u32 offset = work->target_offset;
 
 	down_read(&rdev->exclusive_lock);
 	if (work->fence) {
@@ -471,9 +472,7 @@ static void radeon_flip_work_func(struct work_struct *__work)
 
 	/* do the flip (mmio) */
 	radeon_page_flip(rdev, radeon_crtc->crtc_id, work->base, work->async);
-	if (work->target_offset)
-		radeon_page_flip(rdev, radeon_crtc->crtc_id, 
-			work->base + work->target_offset, work->async);
+	radeon_page_flip(rdev, radeon_crtc->crtc_id, work->base, (bool)offset);
 
 	radeon_crtc->flip_status = RADEON_FLIP_SUBMITTED;
 	spin_unlock_irqrestore(&crtc->dev->event_lock, flags);

@@ -163,11 +163,13 @@ void r100_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, bool
 {
 	struct radeon_crtc *radeon_crtc = rdev->mode_info.crtcs[crtc_id];
 	u32 tmp = ((u32)crtc_base) | RADEON_CRTC_OFFSET__OFFSET_LOCK;
+	u32 offset = (u32)async;
 	int i;
 
 	/* Lock the graphics update lock */
 	/* update the scanout addresses */
 	WREG32(RADEON_CRTC_OFFSET + radeon_crtc->crtc_offset, tmp);
+	WREG32(RADEON_CRTC_OFFSET_RIGHT + radeon_crtc->crtc_offset, tmp + offset);
 
 	/* Wait for update_pending to go high. */
 	for (i = 0; i < rdev->usec_timeout; i++) {
@@ -180,7 +182,7 @@ void r100_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, bool
 	/* Unlock the lock, so double-buffering can take place inside vblank */
 	tmp &= ~RADEON_CRTC_OFFSET__OFFSET_LOCK;
 	WREG32(RADEON_CRTC_OFFSET + radeon_crtc->crtc_offset, tmp);
-
+	WREG32(RADEON_CRTC_OFFSET_RIGHT + radeon_crtc->crtc_offset, tmp + offset);
 }
 
 /**
