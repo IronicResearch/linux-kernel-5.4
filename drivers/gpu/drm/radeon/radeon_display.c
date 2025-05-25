@@ -471,7 +471,6 @@ static void radeon_flip_work_func(struct work_struct *__work)
 	radeon_irq_kms_pflip_irq_get(rdev, radeon_crtc->crtc_id);
 
 	/* do the flip (mmio) */
-	radeon_page_flip(rdev, radeon_crtc->crtc_id, work->base, work->async);
 	radeon_page_flip(rdev, radeon_crtc->crtc_id, work->base, (bool)offset);
 
 	radeon_crtc->flip_status = RADEON_FLIP_SUBMITTED;

@@ -183,6 +183,13 @@ void r100_page_flip(struct radeon_device *rdev, int crtc_id, u64 crtc_base, bool
 	tmp &= ~RADEON_CRTC_OFFSET__OFFSET_LOCK;
 	WREG32(RADEON_CRTC_OFFSET + radeon_crtc->crtc_offset, tmp);
 	WREG32(RADEON_CRTC_OFFSET_RIGHT + radeon_crtc->crtc_offset, tmp + offset);
+
+	/* enable stereo page-flip mode if left/right offset */
+	if (offset) {
+		tmp = RREG32(RADEON_CRTC_OFFSET_CNTL + radeon_crtc->crtc_offset);
+		tmp |= RADEON_CRTC_OFFSET_FLIP_CNTL | RADEON_CRTC_STEREO_OFFSET_EN;
+		WREG32(RADEON_CRTC_OFFSET_CNTL + radeon_crtc->crtc_offset, tmp);
+	}
 }
 
 /**
